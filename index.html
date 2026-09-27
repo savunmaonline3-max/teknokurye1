@@ -2,237 +2,82 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeknoJet Plus | Gaziantep Hızlı Teknoloji Kuryesi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TeknoJet & Gece Express | Gaziantep VIP Acil Kurye Ağı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
+            --bg-dark: #07090e;
+            --card-bg: #0f1420;
+            --input-bg: #161c2c;
             --accent-green: #10b981;
+            --accent-orange: #f97316;
+            --border-color: #1e2638;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
-            --border-color: #334155;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* Header */
+        header { width: 100%; max-width: 1100px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); background: rgba(15, 20, 32, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-orange); }
+        .badge { background: rgba(249, 115, 22, 0.12); color: var(--accent-orange); padding: 8px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; border: 1px solid rgba(249, 115, 22, 0.25); display: flex; align-items: center; gap: 8px; }
 
-        header {
-            width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
+        /* Main Container */
+        .main-container { width: 100%; max-width: 680px; padding: 25px 18px 40px 18px; }
+        
+        .hero-title { text-align: center; margin-bottom: 25px; }
+        .hero-title h1 { font-size: 2.1rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .hero-title p { color: var(--text-sub); font-size: 0.95rem; }
 
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* Main Order Form Card */
+        .order-card { background: var(--card-bg); border-radius: 20px; padding: 24px; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
 
-        .logo span {
-            color: var(--accent-green);
-        }
+        .section-label { font-size: 0.78rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 12px; }
 
-        .badge {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-green);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        /* Service Grid Options */
+        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 22px; }
+        .service-card { background: var(--input-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 14px; color: var(--text-sub); cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 0.9rem; font-weight: 700; }
+        .service-card i { font-size: 1.6rem; color: var(--text-sub); transition: 0.25s; }
+        .service-card.active { border-color: var(--accent-orange); color: #fff; background: rgba(249, 115, 22, 0.1); }
+        .service-card.active i { color: var(--accent-orange); }
 
-        .main-container {
-            width: 100%;
-            max-width: 650px;
-            padding: 30px 20px;
-        }
+        /* Quick Tags */
+        .quick-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tag-item { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-sub); padding: 7px 13px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .tag-item:hover { border-color: var(--accent-orange); color: #fff; }
 
-        .hero-title {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        /* Form Structure */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; }
+        
+        .form-control { width: 100%; padding: 14px 16px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-size: 0.95rem; font-weight: 600; transition: 0.25s; }
+        .form-control:focus { outline: none; border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); }
 
-        .hero-title h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
+        /* Information Box */
+        .info-box { background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 12px; padding: 14px; font-size: 0.83rem; color: var(--text-sub); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; line-height: 1.4; }
+        .info-box i { font-size: 1.3rem; color: var(--accent-orange); }
 
-        .hero-title p {
-            color: var(--text-sub);
-            font-size: 1rem;
-        }
+        /* Price Calculation Display */
+        .price-panel { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; }
+        .price-panel span { font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; }
+        .price-panel h2 { font-size: 2.1rem; font-weight: 800; color: var(--accent-orange); }
 
-        .order-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-        }
+        /* Action Button */
+        .btn-submit { width: 100%; padding: 18px; background: var(--accent-orange); color: #fff; border: none; border-radius: 14px; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.25s ease; box-shadow: 0 10px 20px rgba(249, 115, 22, 0.25); }
+        .btn-submit:hover { opacity: 0.92; transform: translateY(-2px); }
 
-        .service-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .service-btn {
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            border-radius: 12px;
-            color: var(--text-sub);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        .service-btn i {
-            font-size: 1.4rem;
-        }
-
-        .service-btn.active {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.08);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-sub);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-green);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 90px;
-        }
-
-        .price-calculator {
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-info span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .price-info h3 {
-            font-size: 2rem;
-            color: var(--accent-green);
-            font-weight: 800;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: var(--accent-green);
-            color: #0f172a;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-submit:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 25px;
-            color: var(--text-sub);
-            font-size: 0.85rem;
-            text-align: center;
-        }
+        footer { margin-top: auto; padding: 25px; color: var(--text-sub); font-size: 0.85rem; text-align: center; border-top: 1px solid var(--border-color); width: 100%; }
 
         @media (max-width: 600px) {
             .form-row { grid-template-columns: 1fr; }
-            .service-selector { grid-template-columns: 1fr; }
+            .service-grid { grid-template-columns: 1fr 1fr; }
+            .hero-title h1 { font-size: 1.7rem; }
         }
     </style>
 </head>
@@ -240,39 +85,54 @@
 
     <header>
         <div class="logo">
-            <i class="fa-solid fa-bolt" style="color: var(--accent-green);"></i> TEKNOJET<span>PLUS</span>
+            <i class="fa-solid fa-bolt" style="color: var(--accent-orange);"></i> TEKNOJET <span>EXPRESS</span>
         </div>
         <div class="badge">
-            <i class="fa-solid fa-circle" style="font-size: 8px;"></i> 30 Dk. Hızlı Teslimat
+            <i class="fa-solid fa-motorcycle"></i> Gaziantep 7/24 VIP Kurye
         </div>
     </header>
 
     <div class="main-container">
         <div class="hero-title">
-            <h1>Hızlı Teknoloji Kuryesi</h1>
-            <p>Gaziantep içi acil şarj, kablo, aksesuarlar anında adresinizde!</p>
+            <h1>Acil Kurye & Teslimat Çağır</h1>
+            <p>Gece boyunca yemek, nöbetçi eczane, büfe & tekel ve acil şarj ihtiyaçlarınız kapınızda!</p>
         </div>
 
         <div class="order-card">
-            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; display: block; margin-bottom: 12px;">Hizmet / Ürün Türü Seçin</label>
-            <div class="service-selector">
-                <div class="service-btn active" data-service="Acil Powerbank / Şarj Kuryesi" data-price="120">
-                    <i class="fa-solid fa-charging-station"></i>
-                    Acil Powerbank Kurye
+            <span class="section-label">1. Hizmet Kategori Seçimi</span>
+            <div class="service-grid">
+                <div class="service-card active" data-service="Gece Yemek & Tatlı">
+                    <i class="fa-solid fa-utensils"></i>
+                    Gece Yemek & Tatlı
                 </div>
-                <div class="service-btn" data-service="Kablo & Adaptör Teslimatı" data-price="100">
-                    <i class="fa-solid fa-plug"></i>
-                    Kablo & Adaptör Getir
+                <div class="service-card" data-service="Nöbetçi Eczane & Sağlık">
+                    <i class="fa-solid fa-notes-medical"></i>
+                    Nöbetçi Eczane
+                </div>
+                <div class="service-card" data-service="Büfe & Tekel Siparişi">
+                    <i class="fa-solid fa-wine-bottle"></i>
+                    Büfe / Market / Tekel
+                </div>
+                <div class="service-card" data-service="Acil Powerbank & Şarj">
+                    <i class="fa-solid fa-battery-charging"></i>
+                    Acil Powerbank & Şarj
                 </div>
             </div>
 
-            <form id="orderForm">
+            <span class="section-label">Hızlı Adres / Yer Seçimi (Opsiyonel)</span>
+            <div class="quick-tags">
+                <span class="tag-item" onclick="setQuickPlace('Nöbetçi Eczane')">🏥 Nöbetçi Eczane</span>
+                <span class="tag-item" onclick="setQuickPlace('Gece Açık Büfe / Tekel')">🍾 Açık Büfe / Tekel</span>
+                <span class="tag-item" onclick="setQuickPlace('Gece Açık Çorbacı / Kebapçı')">🍲 Çorbacı / Kebapçı</span>
+                <span class="tag-item" onclick="setQuickPlace('TeknoJet Şarj Noktası')">⚡️ Acil Powerbank / Şarj</span>
+            </div>
+
+            <form id="expressOrderForm">
                 <div class="form-row">
                     <div class="form-group">
                         <label><i class="fa-regular fa-user"></i> Ad Soyad</label>
                         <input type="text" id="customerName" class="form-control" placeholder="Hasan Aslan" required>
                     </div>
-
                     <div class="form-group">
                         <label><i class="fa-solid fa-phone"></i> Telefon Numarası</label>
                         <input type="tel" id="phone" class="form-control" placeholder="0507 518 8663" required>
@@ -280,68 +140,109 @@
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-location-dot"></i> Teslimat Adresi (Gaziantep)</label>
-                    <textarea id="address" class="form-control" placeholder="Mahalle, Cadde, Sokak, Bina No ve İrtibat detayları..." required></textarea>
+                    <label><i class="fa-solid fa-store"></i> Alım Adresi (Nereden Alınacak?)</label>
+                    <input type="text" id="pickupAddress" class="form-control" placeholder="Örn: Kebapçı X / Nöbetçi Eczane Y / Açık Büfe..." required>
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-wallet"></i> Ödeme Yöntemi</label>
-                    <select id="paymentMethod" class="form-control">
-                        <option value="Kapıda Nakit">Kapıda Nakit Ödeme</option>
-                        <option value="Kapıda Kredi Kartı">Kapıda POS / Kredi Kartı</option>
-                        <option value="Havale / EFT">Havale / EFT</option>
-                    </select>
+                    <label><i class="fa-solid fa-location-dot"></i> Teslimat Adresi (Nereye Gelecek?)</label>
+                    <input type="text" id="deliveryAddress" class="form-control" placeholder="Örn: İbrahimli Mah. Batıkent Cad. No:12 Daire:4" required>
                 </div>
 
-                <div class="price-calculator">
-                    <div class="price-info">
-                        <span>Hesaplanan Hizmet Tutarı</span>
-                        <h3 id="totalPriceDisplay">120 TL</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-route"></i> Tahmini Mesafe (KM)</label>
+                        <select id="distanceKm" class="form-control">
+                            <option value="0 - 6 KM (Şehir İçi)" data-add="0">0 - 6 KM (Standart Bölge)</option>
+                            <option value="6 - 12 KM (Orta Mesafe)" data-add="40">6 - 12 KM (+40 TL Fark)</option>
+                            <option value="12 - 20 KM (Organize Sanayi)" data-add="80">12 - 20 KM (+80 TL Fark)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-wallet"></i> Ödeme Şekli</label>
+                        <select id="paymentMethod" class="form-control">
+                            <option value="Kapıda Nakit">Kapıda Nakit Ödeme</option>
+                            <option value="Kapıda POS / Kart">Kapıda Kredi Kartı</option>
+                            <option value="IBAN / EFT">IBAN / Havale</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-regular fa-note-sticky"></i> Sipariş Detayı / Kuryeye Not</label>
+                    <input type="text" id="note" class="form-control" placeholder="Örn: 2 porsiyon beyti, 1 kola / Eczaneden ağrı kesici..." required>
+                </div>
+
+                <div class="info-box">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>Hesaplanan tutar <b>sadece kurye taşıma ücretidir</b>. Alınan ürün/yemek bedeli restoran veya mağaza fişine göre kapıda kuryeye ödenir.</div>
+                </div>
+
+                <div class="price-panel">
+                    <div>
+                        <span>Kurye Taşıma Ücreti</span>
+                        <h2 id="totalPriceDisplay">120 TL</h2>
                     </div>
                     <div style="color: var(--text-sub); font-size: 0.85rem; text-align: right;">
-                        <i class="fa-solid fa-bolt" style="color: var(--accent-green);"></i> Işık Hızında Teslimat
+                        <i class="fa-solid fa-clock" style="color: var(--accent-orange);"></i> 30-40 Dk. Teslimat
                     </div>
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    <i class="fa-solid fa-paper-plane"></i> Siparişi Onayla & Kurye Çağır
+                    <i class="fa-solid fa-motorcycle"></i> VIP Kuryeyi Adrese Çağır
                 </button>
             </form>
         </div>
     </div>
 
     <footer>
-        &copy; 2026 TeknoJet Plus - Gaziantep Acil Teknoloji Kurye Ağı
+        &copy; 2026 TeknoJet & Gece Express VIP Lojistik | Gaziantep
     </footer>
 
     <script>
-        let selectedService = "Acil Powerbank / Şarj Kuryesi";
-        let currentPrice = 120;
+        let selectedService = "Gece Yemek & Tatlı";
+        const basePrice = 120;
 
-        document.querySelectorAll('.service-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
+        function setQuickPlace(placeName) {
+            document.getElementById('pickupAddress').value = placeName;
+        }
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 selectedService = this.getAttribute('data-service');
-                currentPrice = parseInt(this.getAttribute('data-price'));
-                document.getElementById('totalPriceDisplay').innerText = currentPrice + " TL";
+                updatePrice();
             });
         });
 
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+        document.getElementById('distanceKm').addEventListener('change', updatePrice);
+
+        function updatePrice() {
+            const distanceSelect = document.getElementById('distanceKm');
+            const distanceExtra = parseInt(distanceSelect.options[distanceSelect.selectedIndex].getAttribute('data-add'));
+            const totalPrice = basePrice + distanceExtra;
+            document.getElementById('totalPriceDisplay').innerText = totalPrice + " TL";
+            return totalPrice;
+        }
+
+        document.getElementById('expressOrderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btn = document.querySelector('.btn-submit');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gönderiliyor...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kurye Yönlendiriliyor...';
             btn.disabled = true;
 
             const orderData = {
                 customerName: document.getElementById('customerName').value,
                 phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value,
-                paymentMethod: document.getElementById('paymentMethod').value,
+                pickupAddress: document.getElementById('pickupAddress').value,
+                deliveryAddress: document.getElementById('deliveryAddress').value,
                 serviceType: selectedService,
-                total: currentPrice
+                distanceKm: document.getElementById('distanceKm').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                note: document.getElementById('note').value,
+                total: updatePrice()
             };
 
             try {
@@ -350,19 +251,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
                 });
-
                 const data = await res.json();
-
                 if (data.success) {
-                    alert('🚀 Siparişiniz başarıyla alındı! Kuryemiz yola çıktı. WhatsApp üzerinden onay mesajınız iletilmiştir.');
-                    document.getElementById('orderForm').reset();
+                    alert('🚀 Kurye talebiniz alındı! WhatsApp onay mesajınız iletilmiştir.');
+                    document.getElementById('expressOrderForm').reset();
+                    updatePrice();
                 } else {
                     alert('Hata oluştu: ' + data.error);
                 }
             } catch (err) {
-                alert('Bağlantı hatası oluştu!');
+                alert('Bağlantı hatası!');
             } finally {
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Siparişi Onayla & Kurye Çağır';
+                btn.innerHTML = '<i class="fa-solid fa-motorcycle"></i> VIP Kuryeyi Adrese Çağır';
                 btn.disabled = false;
             }
         });
