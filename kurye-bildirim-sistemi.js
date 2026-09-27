@@ -1,171 +1,124 @@
-/**
- * TeknoJet Plus — Kurye Bildirim Servisi
- * ---------------------------------------
- * Ne yapar:
- *  1) Yeni sipariş geldiğinde (webhook/HTTP endpoint) kurye Telegram grubuna/botuna
- *     - Sesli bildirim tetikleyen bir mesaj (Telegram "disable_notification: false" + öncelik)
- *     - Google Maps konum linki
- *     - Sipariş detaylarını (ürünler, adres, ödeme yöntemi, telefon)
- *     içeren bir mesaj gönderir.
- *  2) Kurye Telegram'da inline buton ile "Siparişi Üstlendim" der -> sipariş o kuryeye atanır
- *     ve web sitesindeki canlı takip ekranına "Kuryede / Yolda" durumu + kurye adı düşer.
- *
- * Gereken paketler:
- *   npm install express node-telegram-bot-api dotenv
- *
- * .env dosyası:
- *   TELEGRAM_BOT_TOKEN=xxxxx:yyyyy   (BotFather'dan alınır)
- *   COURIER_CHAT_ID=-1001234567890   (kurye grubunun chat id'si, ya da tek kurye ise onun user id'si)
- *   PORT=3000
- *
- * Kurulum notu:
- *   - BotFather'da /newbot ile bot oluştur, token'ı al.
- *   - Botu kurye grubuna ekle, admin yap.
- *   - Grubun chat_id'sini öğrenmek için: bota grupta bir mesaj attır, sonra
- *     https://api.telegram.org/bot<TOKEN>/getUpdates adresine gidip "chat":{"id":...} alanına bak.
- */
-
 require('dotenv').config();
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(__dirname));
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const COURIER_CHAT_ID = process.env.COURIER_CHAT_ID;
+// Telegram ve Green-API Sabit Bilgileri
+const BOT_TOKEN = '8771105373:AAHCLCXbuhmUpCPa6EUXaGjRKIjLUURqemw';
+const CHAT_ID = '-1003900873538';
+const GREEN_ID_INSTANCE = '710722747828';
+const GREEN_API_TOKEN = 'ce58288d5c364e0e834dfd39e5fe731320d3ef2712a3402e86';
 
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
+// polling: false yapılarak hatanın önüne geçilir
+const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
-// Basit bellek-içi sipariş deposu (gerçek sistemde bir veritabanı — Firestore/Postgres — kullanılmalı)
-const orders = {}; // orderId -> { status, courier, ... }
+// Müşteriye Otomatik WhatsApp Mesajı Gönderme
+async function sendWhatsAppNotification(phone, customerName, orderId, total, itemText) {
+    try {
+        let cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone.startsWith('0')) {
+            cleanPhone = '90' + cleanPhone.substring(1);
+        } else if (!cleanPhone.startsWith('90')) {
+            cleanPhone = '90' + cleanPhone;
+        }
 
-/**
- * 1) YENİ SİPARİŞ GELDİĞİNDE ÇAĞRILAN FONKSİYON
- * Web sitesindeki checkout formu bu bilgiyi backend'e (bu Express sunucusuna) POST eder.
- */
-async function notifyCourierOfNewOrder(order) {
-  const {
-    orderId, customerName, phone, address, note,
-    paymentMethod, items, total, lat, lng
-  } = order;
+        const waUrl = `https://7107.api.greenapi.com/waInstance${GREEN_ID_INSTANCE}/sendMessage/${GREEN_API_TOKEN}`;
+        
+        const waMessage = 
+`⚡️ *TEKNOJET PLUS | SIPARISINIZ ALINDI!*
 
-  orders[orderId] = { status: 'Hazırlanıyor', ...order };
+Merhaba *${customerName}*,
 
-  const itemLines = items.map(it => `• ${it.qty}x ${it.name}`).join('\n');
-  const mapsLink = (lat && lng)
-    ? `https://maps.google.com/?q=${lat},${lng}`
-    : `https://maps.google.com/?q=${encodeURIComponent(address + ', Gaziantep')}`;
+*#TJ-${orderId}* numaralı teknoloji kurye siparişiniz başarıyla alınmıştır.
 
-  const text =
-`🚨 YENİ SİPARİŞ — #${orderId}
+📦 *Sipariş İçeriği:* ${itemText}
+💰 *Toplam Tutar:* ${total} TL
+🛵 *Durum:* Kuryemiz siparişinizi hazırladı ve adresinize doğru yola çıktı!
 
-👤 ${customerName}
-📞 ${phone}
-📍 ${address}
-${note ? `📝 Not: ${note}\n` : ''}💳 Ödeme: ${paymentMethod}
+Gaziantep içi ışık hızında teslimat ilkesiyle en kısa sürede adresinizde olacağız.
 
-${itemLines}
-💰 Toplam: ${total} ₺
+_Canlı Destek & İletişim: 0507 518 8663_`;
 
-📍 Konum: ${mapsLink}`;
+        await fetch(waUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chatId: `${cleanPhone}@c.us`,
+                message: waMessage
+            })
+        });
 
-  // disable_notification: false -> Telegram'da sesli/titreşimli bildirim tetiklenir (varsayılan zaten budur,
-  // burada bilinçli olarak belirtiyoruz ki sessiz moda düşmesin).
-  await bot.sendMessage(COURIER_CHAT_ID, text, {
-    disable_notification: false,
-    reply_markup: {
-      inline_keyboard: [[
-        { text: '✅ Siparişi Üstlendim', callback_data: `claim:${orderId}` }
-      ]]
+        console.log(`WhatsApp bildirimi gönderildi: ${cleanPhone}`);
+    } catch (err) {
+        console.error("WhatsApp Gönderim Hatası:", err.message);
     }
-  });
 }
 
-/**
- * 2) KURYE "Siparişi Üstlendim" BUTONUNA BASINCA
- */
-bot.on('callback_query', async (query) => {
-  const [action, orderId] = query.data.split(':');
-  if (action !== 'claim') return;
-
-  const courierName = [query.from.first_name, query.from.last_name].filter(Boolean).join(' ');
-
-  if (!orders[orderId]) {
-    return bot.answerCallbackQuery(query.id, { text: 'Sipariş bulunamadı.' });
-  }
-  if (orders[orderId].courier) {
-    return bot.answerCallbackQuery(query.id, { text: `Bu sipariş zaten ${orders[orderId].courier} tarafından alındı.` });
-  }
-
-  orders[orderId].courier = courierName;
-  orders[orderId].status = 'Kuryede / Yolda';
-
-  await bot.answerCallbackQuery(query.id, { text: 'Sipariş sana atandı, iyi teslimatlar!' });
-  await bot.editMessageText(
-    `${query.message.text}\n\n✅ Üstlenen kurye: ${courierName}`,
-    { chat_id: query.message.chat.id, message_id: query.message.message_id }
-  );
-
-  // Burada web sitesine (canlı takip ekranına) durumu iletmek gerekir.
-  // En pratik yöntem: bir WebSocket sunucusu (örn. socket.io) ile anlık push,
-  // ya da web sitesinin sipariş durumunu birkaç saniyede bir bu backend'den polling ile çekmesi.
-  pushStatusToWebsite(orderId, orders[orderId]);
-});
-
-/**
- * Web sitesine anlık durum iletimi (örnek — gerçek projede socket.io kullanılabilir)
- */
-function pushStatusToWebsite(orderId, orderData) {
-  // io.to(orderId).emit('status_update', { status: orderData.status, courier: orderData.courier });
-  console.log(`[WEBSITE PUSH] Sipariş #${orderId}: ${orderData.status} — Kurye: ${orderData.courier || '-'}`);
-}
-
-/**
- * WEB SİTESİNDEN GELEN SİPARİŞ WEBHOOK'U
- * Checkout formu submit olduğunda frontend bu endpoint'e POST atar.
- */
 app.post('/api/orders', async (req, res) => {
-  const order = req.body;
-  order.orderId = order.orderId || ('TJ' + Math.floor(1000 + Math.random() * 9000));
+    try {
+        const { customerName, phone, address, paymentMethod, serviceType, total } = req.body;
+        const orderId = Math.floor(100000 + Math.random() * 900000);
+        
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address + ' Gaziantep')}`;
+        
+        let cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+        if (cleanPhone.startsWith('0')) {
+            cleanPhone = '90' + cleanPhone.substring(1);
+        } else if (!cleanPhone.startsWith('90')) {
+            cleanPhone = '90' + cleanPhone;
+        }
+        const waContactUrl = `https://wa.me/${cleanPhone}`;
 
-  try {
-    await notifyCourierOfNewOrder(order);
-    res.json({ ok: true, orderId: order.orderId });
-  } catch (err) {
-    console.error('Kurye bildirimi gönderilemedi:', err);
-    res.status(500).json({ ok: false, error: 'Bildirim gönderilemedi' });
-  }
-});
+        // 1. TELEGRAM KURYE KANAL BİLDİRİMİ
+        const telegramMessage = 
+`⚡️ <b>TEKNOJET PLUS | YENİ SİPARİŞ BİLDİRİMİ</b>
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-/**
- * Sipariş durumu sorgusu — canlı takip ekranı bu endpoint'i birkaç saniyede
- * bir çağırarak (polling) ya da socket.io ile durumu günceller.
- */
-app.get('/api/orders/:orderId/status', (req, res) => {
-  const order = orders[req.params.orderId];
-  if (!order) return res.status(404).json({ ok: false });
-  res.json({ ok: true, status: order.status, courier: order.courier || null });
+🆔 <b>SİPARİŞ NO:</b> <code>#TJ-${orderId}</code>
+⏰ <b>TARİH/SAAT:</b> <code>${new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</code>
+
+👤 <b>MÜŞTERİ BİLGİLERİ</b>
+• <b>Ad Soyad:</b> <code>${customerName}</code>
+• <b>Telefon:</b> <code>${phone}</code>
+• <b>Ürün / Hizmet:</b> <code>${serviceType}</code>
+• <b>Ödeme Tipi:</b> <code>${paymentMethod}</code>
+
+📍 <b>TESLİMAT ADRESİ</b>
+<code>${address} / Gaziantep</code>
+
+💰 <b>TOPLAM TUTAR:</b> <b>${total} TL</b>
+➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+<i>Sipariş TeknoJet kurye paneline otomatik aktarılmıştır.</i>`;
+
+        await bot.sendMessage(CHAT_ID, telegramMessage, { 
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "📍 Google Maps Konumu", url: mapsUrl }
+                    ],
+                    [
+                        { text: "💬 Müşteri WhatsApp İletişim", url: waContactUrl }
+                    ]
+                ]
+            }
+        });
+
+        // 2. OTOMATİK WHATSAPP MESAJI GÖNDERİMİ
+        sendWhatsAppNotification(phone, customerName, orderId, total, serviceType);
+
+        res.status(200).json({ success: true, orderId });
+    } catch (error) {
+        console.error("Sipariş Hatası:", error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Kurye bildirim servisi ${PORT} portunda çalışıyor.`));
-
-/**
- * ÖRNEK KULLANIM — frontend'den siparişi bu backend'e gönderme:
- *
- * fetch('https://senin-backend-adresin.com/api/orders', {
- *   method: 'POST',
- *   headers: { 'Content-Type': 'application/json' },
- *   body: JSON.stringify({
- *     customerName: 'Ahmet Yılmaz',
- *     phone: '05xx xxx xx xx',
- *     address: 'Şahinbey, ... Sokak No:5',
- *     note: 'Zil çalışmıyor',
- *     paymentMethod: 'Kapıda Nakit',
- *     items: [{ name: '10.000 mAh Powerbank', qty: 1 }],
- *     total: 349,
- *     lat: 37.0662, lng: 37.3833
- *   })
- * });
- */
+app.listen(PORT, () => {
+    console.log(`TeknoJet Plus Sunucusu ${PORT} portunda aktif!`);
+});
