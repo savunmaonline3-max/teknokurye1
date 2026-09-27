@@ -1,0 +1,14 @@
+{
+  "name": "teknojet-plus",
+  "version": "1.0.0",
+  "description": "TeknoJet Plus - Hızlı Teknoloji & Şarj Kurye Hizmetleri",
+  "main": "kurye-bildirim-sistemi.js",
+  "scripts": {
+    "start": "node kurye-bildirim-sistemi.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}
